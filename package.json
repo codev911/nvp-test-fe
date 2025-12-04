@@ -12,12 +12,14 @@
     "check": "biome check .",
     "lint:fix": "biome lint --write .",
     "format:fix": "biome format --write .",
-    "check:fix": "biome check --write ."
+    "check:fix": "biome check --write .",
+    "prepare": "husky"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.62.8",
     "@tanstack/react-virtual": "^3.10.9",
     "@types/node": "^22.9.0",
+    "husky": "^9.1.7",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-router-dom": "^6.28.1",
