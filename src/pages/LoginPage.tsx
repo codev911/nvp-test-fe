@@ -2,8 +2,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/AuthContext';
 
-const defaultEmail = 'admin@nusa.id';
-const defaultPassword = 'Admin123!';
+const defaultEmail = 'superadmin@example.com';
+const defaultPassword = 'superadmin123!';
 
 export default function LoginPage() {
   const navigate = useNavigate();

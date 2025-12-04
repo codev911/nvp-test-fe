@@ -12,7 +12,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onCreateRows: (rows: Array<{ name: string; age: number; position: string; salary: number }>) => Promise<void>;
-  onUploadCsv: (content: string) => Promise<void>;
+  onUploadCsv: (file: File) => Promise<void>;
   uploadProgress: { percent: number; processed: number; total: number };
   uploading: boolean;
   creating: boolean;
@@ -75,9 +75,8 @@ export function AddEmployeeModal({
   const handleCsvPick = async (file?: File | null) => {
     if (!file) return;
     setErrors(null);
-    const text = await file.text();
     setShowProgress(true);
-    await onUploadCsv(text);
+    await onUploadCsv(file);
   };
 
   const addRow = () => setRows((prev) => [...prev, { name: '', age: '', position: '', salary: '' }]);

@@ -9,8 +9,11 @@ type Props = {
   pageSize: number;
   loading: boolean;
   search: string;
+  sortField: 'name' | 'age' | 'position' | 'salary';
+  sortOrder: 'asc' | 'desc';
   onSearch: (value: string) => void;
   onPageChange: (page: number) => void;
+  onSortChange: (field: 'name' | 'age' | 'position' | 'salary') => void;
   onAdd: () => void;
   onEdit: (employee: Employee) => void;
   onDelete: (employee: Employee) => void;
@@ -23,8 +26,11 @@ export function EmployeeTable({
   pageSize,
   loading,
   search,
+  sortField,
+  sortOrder,
   onSearch,
   onPageChange,
+  onSortChange,
   onAdd,
   onEdit,
   onDelete,
@@ -71,10 +77,10 @@ export function EmployeeTable({
       </div>
 
       <div className="grid grid-cols-[2fr,1fr,1.2fr,1fr,0.9fr] text-xs uppercase tracking-[0.15em] text-slate-500 px-5 py-3 border-b border-slate-800">
-        <div>Nama</div>
-        <div>Umur</div>
-        <div>Jabatan</div>
-        <div>Gaji</div>
+        <HeaderSortButton label="Nama" active={sortField === 'name'} order={sortOrder} onClick={() => onSortChange('name')} />
+        <HeaderSortButton label="Umur" active={sortField === 'age'} order={sortOrder} onClick={() => onSortChange('age')} />
+        <HeaderSortButton label="Jabatan" active={sortField === 'position'} order={sortOrder} onClick={() => onSortChange('position')} />
+        <HeaderSortButton label="Gaji" active={sortField === 'salary'} order={sortOrder} onClick={() => onSortChange('salary')} />
         <div className="text-right">Aksi</div>
       </div>
 
@@ -153,4 +159,31 @@ export function EmployeeTable({
 
 function placeholder(label: string) {
   return <span className="inline-block animate-pulse bg-slate-800/80 h-3 rounded w-24">{label}</span>;
+}
+
+function HeaderSortButton({
+  label,
+  active,
+  order,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  order: 'asc' | 'desc';
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center gap-2 text-left transition ${
+        active ? 'text-cyan-300' : 'hover:text-slate-300'
+      }`}
+    >
+      <span>{label}</span>
+      <span className="text-[10px] leading-none bg-slate-800/80 px-2 py-1 rounded-lg border border-slate-700">
+        {active ? (order === 'asc' ? '▲' : '▼') : '↕'}
+      </span>
+    </button>
+  );
 }

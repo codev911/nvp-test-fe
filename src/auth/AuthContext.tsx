@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
-import { login as loginApi } from '@/lib/mockBackend';
+import { getProfile, login as loginApi } from '@/lib/api';
 import type { AuthUser } from '@/types';
 
 type AuthContextValue = {
@@ -33,10 +33,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const { token: newToken, user: profile } = await loginApi(email, password);
+      const { token: newToken } = await loginApi(email, password);
+      const profile = await getProfile(newToken);
+      const mappedUser: AuthUser = {
+        email,
+        name: profile.username || email,
+      };
       setToken(newToken);
-      setUser(profile);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: newToken, user: profile }));
+      setUser(mappedUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ token: newToken, user: mappedUser }));
     } finally {
       setLoading(false);
     }

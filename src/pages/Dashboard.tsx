@@ -14,13 +14,15 @@ import {
   useImportEmployees,
   useUpdateEmployee,
 } from '@/hooks/useEmployees';
-import { markNotificationsRead, subscribeNotifications } from '@/lib/mockBackend';
+import { markNotificationsRead, subscribeNotifications } from '@/lib/notifications';
 import type { Employee, NotificationItem } from '@/types';
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [sortField, setSortField] = useState<'name' | 'age' | 'position' | 'salary'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [showAdd, setShowAdd] = useState(false);
   const [editTarget, setEditTarget] = useState<Employee | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
@@ -28,11 +30,17 @@ export default function DashboardPage() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [importProgress, setImportProgress] = useState({ percent: 0, processed: 0, total: 100 });
 
-  const { data, isLoading } = useEmployeeList(search, page);
-  const createMutation = useCreateEmployee();
-  const updateMutation = useUpdateEmployee();
-  const deleteMutation = useDeleteEmployee();
-  const importMutation = useImportEmployees((info) => setImportProgress(info));
+  const { data, isLoading } = useEmployeeList({
+    search,
+    page,
+    sort: sortField,
+    sortType: sortOrder,
+    token: token || '',
+  });
+  const createMutation = useCreateEmployee(token || '');
+  const updateMutation = useUpdateEmployee(token || '');
+  const deleteMutation = useDeleteEmployee(token || '');
+  const importMutation = useImportEmployees((info) => setImportProgress(info), token || '');
 
   useEffect(() => {
     const unsub = subscribeNotifications((items) => setNotifications(items));
@@ -43,6 +51,12 @@ export default function DashboardPage() {
     setPage(1);
   }, [search]);
 
+  const handleSortChange = (field: 'name' | 'age' | 'position' | 'salary') => {
+    setPage(1);
+    setSortOrder((prev) => (field === sortField ? (prev === 'asc' ? 'desc' : 'asc') : 'asc'));
+    setSortField(field);
+  };
+
   const hasUnread = useMemo(() => notifications.some((n) => !n.read), [notifications]);
 
   const handleCreateRows = async (rows: Array<{ name: string; age: number; position: string; salary: number }>) => {
@@ -51,9 +65,9 @@ export default function DashboardPage() {
     }
   };
 
-  const handleUploadCsv = async (content: string) => {
+  const handleUploadCsv = async (file: File) => {
     setImportProgress({ percent: 0, processed: 0, total: 100 });
-    await importMutation.mutateAsync(content);
+    await importMutation.mutateAsync(file);
   };
 
   const handleEditSave = async (payload: { name: string; age: number; position: string; salary: number }) => {
@@ -119,8 +133,11 @@ export default function DashboardPage() {
           pageSize={PAGE_SIZE}
           loading={isLoading}
           search={search}
+          sortField={sortField}
+          sortOrder={sortOrder}
           onSearch={setSearch}
           onPageChange={setPage}
+          onSortChange={handleSortChange}
           onAdd={() => setShowAdd(true)}
           onEdit={(emp) => setEditTarget(emp)}
           onDelete={(emp) => setDeleteTarget(emp)}
