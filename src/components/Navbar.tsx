@@ -3,9 +3,11 @@ type NavbarProps = {
   onLogout: () => void;
   onOpenNotifications: () => void;
   hasUnread: boolean;
+  processing?: boolean;
+  processLabel?: string;
 };
 
-export function Navbar({ userName, onLogout, onOpenNotifications, hasUnread }: NavbarProps) {
+export function Navbar({ userName, onLogout, onOpenNotifications, hasUnread, processing, processLabel }: NavbarProps) {
   return (
     <header className="sticky top-0 z-30 backdrop-blur-xl bg-slate-950/70 border-b border-slate-900 px-6 md:px-10 py-4">
       <div className="flex items-center justify-between gap-6">
@@ -19,6 +21,12 @@ export function Navbar({ userName, onLogout, onOpenNotifications, hasUnread }: N
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {processing && (
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-400/40 text-amber-100 text-xs">
+              <span className="h-2 w-2 rounded-full bg-amber-300 animate-pulse" />
+              {processLabel || 'Processing...'}
+            </div>
+          )}
           <button
             onClick={onOpenNotifications}
             className="relative h-11 px-4 rounded-xl bg-slate-900/70 border border-slate-800 text-slate-200 hover:border-cyan-500/50 hover:text-cyan-200 transition"

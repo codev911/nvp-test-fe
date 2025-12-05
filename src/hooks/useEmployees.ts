@@ -26,17 +26,14 @@ export function useEmployeeList({
   return useQuery({
     queryKey: ['employees', search, page, sort, sortType],
     queryFn: async () => {
-      const result = await fetchEmployees({ page, pageSize: PAGE_SIZE, sort, sortType, token });
-      if (search.trim()) {
-        const term = search.toLowerCase();
-        const filtered = result.data.filter(
-          (emp) =>
-            emp.name.toLowerCase().includes(term) ||
-            emp.position.toLowerCase().includes(term) ||
-            String(emp.age).includes(term),
-        );
-        return { data: filtered, total: filtered.length };
-      }
+      const result = await fetchEmployees({
+        page,
+        pageSize: PAGE_SIZE,
+        sort,
+        sortType,
+        search,
+        token,
+      });
       return result;
     },
     placeholderData: (prev) => prev,

@@ -78,6 +78,7 @@ export async function fetchEmployees(params: {
   pageSize: number;
   sort: string;
   sortType: 'asc' | 'desc';
+  search?: string;
   token: string;
 }) {
   const query = new URLSearchParams({
@@ -86,6 +87,9 @@ export async function fetchEmployees(params: {
     sort: params.sort,
     sorttype: params.sortType,
   });
+  if (params.search) {
+    query.set('search', params.search);
+  }
   const res = await apiFetch<
     Array<{
       id: string;
@@ -123,10 +127,7 @@ export async function createEmployees(
   const res = await apiFetch<{ total_queued: number }>('/employee/add', {
     method: 'POST',
     token,
-    body: payload.map((item) => ({
-      ...item,
-      department: 'General', // backend validator requires department for now
-    })),
+    body: payload,
   });
   return res.data;
 }
@@ -138,10 +139,7 @@ export async function updateEmployees(
   const res = await apiFetch<{ total_queued: number }>('/employee/update', {
     method: 'PATCH',
     token,
-    body: payload.map((item) => ({
-      ...item,
-      ...(item.position ? { department: 'General' } : {}),
-    })),
+    body: payload,
   });
   return res.data;
 }
@@ -151,6 +149,28 @@ export async function deleteEmployees(ids: string[], token: string) {
     method: 'DELETE',
     token,
     body: ids,
+  });
+  return res.data;
+}
+
+export async function fetchNotifications(token: string) {
+  const res = await apiFetch<
+    Array<{
+      id: string;
+      title: string;
+      message: string;
+      createdAt: string;
+      read: boolean;
+    }>
+  >('/notifications', { method: 'GET', token });
+  return res.data || [];
+}
+
+export async function markNotifications(token: string, ids?: string[]) {
+  const res = await apiFetch<{ modified: number }>('/notifications/read', {
+    method: 'PATCH',
+    token,
+    body: ids || [],
   });
   return res.data;
 }

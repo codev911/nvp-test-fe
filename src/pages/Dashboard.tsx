@@ -43,9 +43,16 @@ export default function DashboardPage() {
   const importMutation = useImportEmployees((info) => setImportProgress(info), token || '');
 
   useEffect(() => {
-    const unsub = subscribeNotifications((items) => setNotifications(items));
-    return unsub;
-  }, []);
+    if (!token) return;
+    let unsubscribe: (() => void) | undefined;
+    subscribeNotifications(token, (items) => setNotifications(items)).then((unsub) => {
+      unsubscribe = unsub;
+    });
+    return () => {
+      unsubscribe?.();
+      setNotifications([]);
+    };
+  }, [token]);
 
   useEffect(() => {
     setPage(1);
@@ -81,12 +88,24 @@ export default function DashboardPage() {
     setDeleteTarget(null);
   };
 
-  const handleMarkRead = () => {
-    markNotificationsRead();
+  const handleMarkRead = async () => {
+    if (!token) return;
+    await markNotificationsRead(token);
     setNotifications((prev) => prev.map((item) => ({ ...item, read: true })));
   };
 
   const totalEmployees = data?.total ?? 0;
+  const processing =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending ||
+    importMutation.isPending;
+  const processLabel =
+    (importMutation.isPending && 'Import in progress') ||
+    (createMutation.isPending && 'Membuat data...') ||
+    (updateMutation.isPending && 'Memperbarui data...') ||
+    (deleteMutation.isPending && 'Menghapus data...') ||
+    undefined;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -95,6 +114,8 @@ export default function DashboardPage() {
         onLogout={logout}
         onOpenNotifications={() => setNotifOpen((v) => !v)}
         hasUnread={hasUnread}
+        processing={processing}
+        processLabel={processLabel}
       />
 
       <div className="relative">
