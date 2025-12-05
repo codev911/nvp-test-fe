@@ -1,46 +1,49 @@
-# Getting Started with Create React App
+# Employee Management FE
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+React + Vite frontend for the employee management system. Requires the backend to be running first.
 
-## Available Scripts
+## Prerequisites
+- Node.js 18+
+- Yarn v1
+- Backend running on `http://localhost:3000` (start `../be-employee-management-system` first)
+- Environment variable `VITE_API_BASE_URL`
 
-In the project directory, you can run:
+## Environment
+| Variable | Description | Default |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | Backend base URL (used for HTTP + WS) | `http://localhost:3000` |
 
-### `yarn start`
+## Setup
+```bash
+yarn install
+cp .env.example .env.local  # adjust VITE_API_BASE_URL if backend port differs
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Scripts
+- `yarn dev` — start Vite dev server.
+- `yarn build` — production build.
+- `yarn preview` — preview the production build.
+- `yarn lint` — run Biome lint.
+- `yarn format` — run Biome format.
+- `yarn check` — run Biome check.
+- `yarn test` — run Vitest unit tests.
+- `yarn test:watch` — watch tests.
+- `yarn test:coverage` — run tests with coverage.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Running locally
+1) Start backend: from `../be-employee-management-system` run `yarn dev` (or your start command) and verify it listens on the port in `VITE_API_BASE_URL`.
+2) Start frontend: `yarn dev` in this folder, then open the URL Vite prints (default http://localhost:5173).
+3) Login using the backend’s seeded credentials (see backend README).
 
-### `yarn test`
+## Project layout
+- `src/auth` — Auth context.
+- `src/hooks` — Data hooks (React Query).
+- `src/components` — UI components and modals.
+- `src/pages` — Route-level pages.
+- `src/lib` — API + notification clients.
+- `src/test` — Unit tests (Vitest + Testing Library).
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Development notes
+- Sorting/search/pagination call the backend; ensure BE supports the query params used in `src/lib/api.ts`.
+- Notifications use WebSocket at `${VITE_API_BASE_URL}/ws/notifications`; BE must be running for realtime updates.
+- Tests use jsdom and stub globals in `src/test/setupTests.ts`.
